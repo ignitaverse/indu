@@ -1,17 +1,15 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from config import Config
-from database.db_handler import DBHandler
+# ❌ OLD: from database.db_handler import DBHandler
+# ✅ NEW: .db_handler को इम्पोर्ट करें (यह मानकर कि admin_handler, database के बराबर फ़ोल्डर में है)
+from ..database.db_handler import DBHandler  # यह सुनिश्चित करें कि यह काम करता है
 
-db = DBHandler()
+# अगर ऊपर वाला काम नहीं करता है, तो इसे आज़माएं:
+# from database.db_handler import DBHandler
 
-def is_owner(user_id: int) -> bool:
-    return user_id == Config.ADMIN_ID
+# सुनिश्चित करें कि DBHandler का इनिशियलाइज़ेशन main.py में connection के बाद हो (पिछले सुझाव के अनुसार)
+# फिलहाल, आप इसे (DBHandler()) हटाकर main.py में एक ग्लोबल variable बना सकते हैं
 
-async def promote_me(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    user = update.effective_user
-    if not is_owner(user.id):
-        await update.message.reply_text("❌ Ye command sirf owner ke liye hai.")
-        return
-    db.set_admin(user.id, True)
-    await update.message.reply_text("✅ Tumhe MovieBot admin bana diya gaya hai.")
+db = DBHandler() # इसे main.py में इनिशियलाइज़ करने के बाद उपयोग करें
+# ...
