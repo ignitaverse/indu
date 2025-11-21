@@ -1,34 +1,21 @@
-import logging
-from telegram import Update
-from telegram.ext import (
-    Application,
-    CommandHandler,
-    ContextTypes,
-)
-from config import Config
+# main (4).py (Updated Code Snippet)
 from handlers.start_handler import start_command
 from handlers.admin_handler import promote_me
+from database.db_handler import db # db_handler से db instance import करें
 
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    level=logging.INFO,
-)
-logger = logging.getLogger(__name__)
-
-async def ping(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text("🏓 Bot is alive!")
+# ... (logging setup) ...
 
 def main() -> None:
     Config.validate()
+    
+    # NEW STEP: Config validation के बाद DB connection शुरू करें
+    try:
+        db.connect()
+        logger.info("MongoDB connected successfully.")
+    except Exception as e:
+        logger.error(f"Error connecting to MongoDB: {e}")
+        return # अगर DB कनेक्ट न हो तो बॉट को रोक दें
 
     application = Application.builder().token(Config.BOT_TOKEN).build()
-
-    application.add_handler(CommandHandler("start", start_command))
-    application.add_handler(CommandHandler("ping", ping))
-    application.add_handler(CommandHandler("promoteme", promote_me))
-
-    logger.info("Bot polling started...")
-    application.run_polling(allowed_updates=Update.ALL_TYPES)
-
-if __name__ == "__main__":
-    main()
+    
+    # ... (rest of the handlers) ...
