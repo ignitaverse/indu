@@ -1,6 +1,10 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from config import Config
+# database access ke liye
+from database.db_handler import get_db_instance 
+# ✅ FIX: is_private function ko helpers se import karein
+from helpers import is_private
 # ✅ FIX 1: get_db_instance को इम्पोर्ट करें
 from database.db_handler import get_db_instance 
 # ✅ FIX 2: is_private function को helpers से इम्पोर्ट करें
