@@ -1,9 +1,12 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from config import Config
-# ✅ FIX 1: अब हम db_handler से get_db_instance फ़ंक्शन इम्पोर्ट करेंगे।
 from database.db_handler import get_db_instance 
+# ❌ OLD: from helpers import is_private 
+
+# ✅ FIX: is_private function को helpers से import करें (जैसा कि पहले ही प्लान किया गया था)
 from helpers import is_private 
+
 import logging
 
 logger = logging.getLogger(__name__)
