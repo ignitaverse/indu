@@ -8,30 +8,18 @@ from telegram.ext import (
 from config import Config
 from handlers.start_handler import start_command
 from handlers.admin_handler import promote_me
-# ✅ FIX 5: DBHandler class को import करें
-from database.db_handler import DBHandler 
+# ❌ OLD: from database.db_handler import DBHandler 
+# ❌ OLD: db = None # इसे हटा दें
 
-# ✅ FIX 6: global DB instance को घोषित करें
-db = None 
 
 # ... (logging setup and ping function) ...
 
 def main() -> None:
-    global db # ग्लोबल वेरिएबल को मॉडिफाई करने के लिए 'global' कीवर्ड का उपयोग करें
+    # ❌ OLD: global db # इसे हटा दें
     
     Config.validate()
     
-    # -----------------------------------------------
-    # 🛑 FIX 7: DB connection को Config validation के बाद शुरू करें
-    # -----------------------------------------------
-    try:
-        db = DBHandler() # DBHandler का इंस्टेंस बनाएं
-        db.connect() # अब connect() कॉल करें
-        logger.info("MongoDB connected successfully.")
-    except Exception as e:
-        logger.error(f"Error connecting to MongoDB: {e}")
-        return # अगर DB कनेक्ट न हो तो बॉट को रोक दें
-    # -----------------------------------------------
+    # ❌ OLD: DB connection logic हटा दें (get_db_instance इसे स्वयं हैंडल करता है)
 
     application = Application.builder().token(Config.BOT_TOKEN).build()
 
@@ -41,7 +29,6 @@ def main() -> None:
 
     logger.info("Bot polling started...")
     application.run_polling(allowed_updates=Update.ALL_TYPES)
-
 
 if __name__ == "__main__":
     main()
