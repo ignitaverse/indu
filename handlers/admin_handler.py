@@ -1,17 +1,17 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from config import Config
-# ❌ OLD: from database.db_handler import DBHandler (यह यहाँ आवश्यक नहीं है)
-from database.db_handler import DBHandler 
+from database.db_handler import DBHandler # केवल क्लास को इम्पोर्ट करें
 
 # --------------------------------------------------------------------------
-# ✅ FIX 1: db instance को main.py से इम्पोर्ट करें
-# यह एक सामान्य हैक है, जो NameError को ठीक करता है।
+# ✅ FIX 1: global_db को 'db' नाम से main.py से इम्पोर्ट करें
 try:
-    from main import db as global_db
+    # main.py में वेरिएबल का नाम 'db' है, इसलिए उसी नाम से इम्पोर्ट करें।
+    from main import db 
 except ImportError:
     # अगर local testing में ImportError आए, तो dummy object बना लें।
-    global_db = DBHandler()
+    print("Warning: Could not import global DB instance from main.py. Creating dummy DBHandler.")
+    db = DBHandler()
 # --------------------------------------------------------------------------
 
 def is_owner(user_id: int) -> bool:
@@ -25,9 +25,9 @@ async def promote_me(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
         await update.message.reply_text("❌ Ye command sirf owner ke liye hai.")
         return
     
-    # ✅ FIX 2: global_db का उपयोग करें
-    if global_db and global_db.client: # सुनिश्चित करें कि कनेक्शन खुला है
-        global_db.set_admin(user.id, True)
+    # ✅ FIX 2: अब 'global_db' के बजाय सीधे 'db' का उपयोग करें
+    if db and db.client: # सुनिश्चित करें कि कनेक्शन खुला है
+        db.set_admin(user.id, True)
         await update.message.reply_text("✅ Tumhe MovieBot admin bana diya gaya hai.")
     else:
         await update.message.reply_text("❌ Database abhi tak connect nahi hua hai ya koi galti hai.")
