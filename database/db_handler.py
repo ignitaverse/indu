@@ -31,6 +31,7 @@ class DBHandler:
             self.users = self.db["users"]
 
     def add_new_user(self, user_id: int, username: str, first_name: str):
+        # यह मेथड जाँच करता है कि यूजर पहले से मौजूद है या नहीं, और अगर नहीं है तो उसे DB में जोड़ता है।
         if not self.users.find_one({"_id": user_id}):
             data = {
                 "_id": user_id,
