@@ -1,15 +1,19 @@
-from telegram import Update
-from telegram.ext import ContextTypes
-from config import Config
-# ❌ OLD: from database.db_handler import DBHandler
-# ✅ NEW: .db_handler को इम्पोर्ट करें (यह मानकर कि admin_handler, database के बराबर फ़ोल्डर में है)
-from ..database.db_handler import DBHandler  # यह सुनिश्चित करें कि यह काम करता है
+# ... (imports) ...
+from database.db_handler import DBHandler
+# import main.global_db_instance (यह मुश्किल है)
 
-# अगर ऊपर वाला काम नहीं करता है, तो इसे आज़माएं:
-# from database.db_handler import DBHandler
+# ❌ OLD: db = DBHandler()
 
-# सुनिश्चित करें कि DBHandler का इनिशियलाइज़ेशन main.py में connection के बाद हो (पिछले सुझाव के अनुसार)
-# फिलहाल, आप इसे (DBHandler()) हटाकर main.py में एक ग्लोबल variable बना सकते हैं
+# ✅ NEW: इस लाइन को हटा दें, और हर DB-required function में DB instance को access करें।
+# चूंकि यह जटिल है, हम global_db_instance को main.py से import करने के लिए मजबूर करते हैं (हालांकि यह bad practice है)
 
-db = DBHandler() # इसे main.py में इनिशियलाइज़ करने के बाद उपयोग करें
-# ...
+# ******************************************************************
+# TEMPORARY FIX: main.py से global instance को import करने का प्रयास करें
+# ******************************************************************
+try:
+    from main import global_db_instance as db
+except ImportError:
+    # अगर main से import नहीं हुआ, तो dummy object बनाएं ताकि Python न क्रैश हो
+    print("Warning: Could not import global DB instance from main.py. Creating dummy DBHandler.")
+    db = DBHandler()
+# ******************************************************************
