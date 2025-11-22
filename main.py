@@ -1,38 +1,36 @@
-import logging
-from telegram import Update
-from telegram.ext import (
-    Application,
-    CommandHandler,
-    ContextTypes,
-)
+# ... (imports) ...
 from config import Config
-# ❌ OLD: from handlers.start_handler import start_command
-# ❌ OLD: from handlers.admin_handler import promote_me
-# ✅ NEW:
 from handlers.start_handler import start_command
 from handlers.admin_handler import promote_me
 from database.db_handler import DBHandler # DBHandler class को import करें
 
-# ... (logging setup) ...
+# Global DB instance variable
+global_db_instance = None 
 
-# Global DB instance (इसे main() के अंदर इनिशियलाइज़ किया जाएगा)
-db = None
+# ... (ping function) ...
 
 def main() -> None:
-    global db # global db variable का उपयोग करने के लिए
+    global global_db_instance # ग्लोबल वेरिएबल को मॉडिफाई करने के लिए
+    
     Config.validate()
     
     # -----------------------------------------------
-    # 🛑 Fix #1: MongoDB Connection को validate के बाद शुरू करें
+    # 🛑 FIX: DB connection को Config validation के बाद शुरू करें
     # -----------------------------------------------
     try:
-        db = DBHandler() # DBHandler class का instance बनाएं
-        # Note: DBHandler __init__ अब Config.MONGO_URI का उपयोग करेगा
-        logger.info("MongoDB connection attempt successful.")
+        # DBHandler का इंस्टेंस बनाएं
+        global_db_instance = DBHandler()
+        # फिर connection शुरू करें
+        global_db_instance.connect()
+        logger.info("MongoDB connected successfully.")
     except Exception as e:
         logger.error(f"Error connecting to MongoDB: {e}")
-        # अगर MongoDB कनेक्ट न हो तो बॉट को रोक दें
+        # अगर DB कनेक्ट न हो तो बॉट को रोक दें
         return 
 
     application = Application.builder().token(Config.BOT_TOKEN).build()
-    # ...
+    
+    # ... (handlers) ...
+    
+    logger.info("Bot polling started...")
+    application.run_polling(allowed_updates=Update.ALL_TYPES)
