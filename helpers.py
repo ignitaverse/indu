@@ -1,7 +1,3 @@
-from datetime import datetime
-
-def format_dt(dt: datetime) -> str:
-    return dt.strftime("%d-%m-%Y %H:%M:%S")
-
-def is_private(chat) -> bool:
-    return chat.type == "private"
+# सहायक फ़ंक्शन निकालने के लिए उपयोगी फ़ंक्शंस
+def format_message(text: str) -> str:
+    return f"**{text}**"
