@@ -6,18 +6,13 @@ from config import Config
 # ✅ FIX 1: Global Variable जो DB instance को रखेगा (Singleton)
 _db_instance = None
 
-def get_db_instance():
-    """Returns the globally initialized DBHandler instance."""
-    global _db_instance
-    if _db_instance is None:
-        # अगर instance मौजूद नहीं है, तो नया बनाएं और कनेक्ट करें
-        _db_instance = DBHandler()
-        _db_instance.connect() 
-    return _db_instance
+# ----------------------------------------------------------------------
+# DBHandler Class Definition
+# ----------------------------------------------------------------------
 
 class DBHandler:
     def __init__(self):
-        # ✅ FIX 2: Connection को __init__ से हटाएं
+        # Connection को __init__ से हटाकर None पर सेट करें
         self.client = None
         self.db = None
         self.users = None
@@ -25,13 +20,13 @@ class DBHandler:
     def connect(self):
         """Initializes the MongoDB connection using Config.MONGO_URI."""
         if self.client is None:
-            # Connection को connect() method में डालें
+            # Connection को connect() method में डालें, यह get_db_instance से कॉल होता है।
             self.client = MongoClient(Config.MONGO_URI)
             self.db = self.client["MovieBotDB"]
             self.users = self.db["users"]
 
+    # ✅ FIX 2: add_new_user method (पिछली बार की Missing method)
     def add_new_user(self, user_id: int, username: str, first_name: str):
-        # यह मेथड जाँच करता है कि यूजर पहले से मौजूद है या नहीं, और अगर नहीं है तो उसे DB में जोड़ता है।
         if not self.users.find_one({"_id": user_id}):
             data = {
                 "_id": user_id,
@@ -51,4 +46,15 @@ class DBHandler:
         user = self.users.find_one({"_id": user_id})
         return bool(user and user.get("is_admin"))
 
-# 🛑 NOTE: फ़ाइल के अंत में 'db = DBHandler()' लाइन को हटा दें (अगर मौजूद हो)।
+# ----------------------------------------------------------------------
+# Singleton Function
+# ----------------------------------------------------------------------
+
+def get_db_instance():
+    """Returns the globally initialized DBHandler instance."""
+    global _db_instance
+    if _db_instance is None:
+        # अगर instance मौजूद नहीं है, तो नया बनाएं और कनेक्ट करें
+        _db_instance = DBHandler()
+        _db_instance.connect() 
+    return _db_instance
